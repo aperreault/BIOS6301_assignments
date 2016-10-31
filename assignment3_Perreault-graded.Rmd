@@ -1,0 +1,196 @@
+---
+title: 'Bios 6301: Assignment 3'
+author: 'Andrea Perreault' 
+output: pdf_document
+---
+
+**Grade: 50/50**
+
+*Due Tuesday, 11 October, 1:00 PM*
+
+50 points total.
+
+$5^{n=day}$ points taken off for each day late.
+
+
+**QUESTION 1**
+
+**10 points**
+
+1. Use GitHub to turn in the first three homework assignments. Make sure the teacher (couthcommander) and TA (chipmanj) are collaborators. (5 points)
+
+2. Commit each assignment individually.  This means your repository should have at least three commits. (5 points)
+
+
+**QUESTION 2**
+
+**15 points**
+
+Write a simulation to calculate the power for the following study
+design.  The study has two variables, treatment group and outcome.
+There are two treatment groups (0, 1) and they should be assigned
+randomly with equal probability.  The outcome should be a random normal
+variable with a mean of 60 and standard deviation of 20.  If a patient
+is in the treatment group, add 5 to the outcome.  5 is the true
+treatment effect.  Create a linear model for the outcome by the
+treatment group, and extract the p-value (hint: see assigment1).
+Test if the p-value is less than or equal to the alpha level, which
+should be set to 0.05.
+
+Repeat this procedure 1000 times. The power is calculated by finding
+the percentage of times the p-value is less than or equal to the alpha
+level.  Use the `set.seed` command so that the professor can reproduce
+your results.
+
+1. Find the power when the sample size is 100 patients. (10 points)
+
+```{r}
+patients1 = 100
+groups = c(0,1)
+mean = 60
+sd = 20
+alpha = 0.05
+p_vals = numeric(1000)
+significant1 = 0
+set.seed(100)
+
+for (i in seq(p_vals)) {
+  treatment <- sample(groups, patients1, replace = TRUE)
+  outcome <- rnorm(100, mean, sd)
+  data <- data.frame(cbind(treatment, outcome))
+  data$outcome[data$treatment == 1] <- data$outcome[data$treatment == 1] + 5
+  model <- lm(outcome ~ treatment, data = data)
+  pval <- summary(model)$coefficients[2,4]
+  p_vals[i] <- pval
+  if (pval < alpha) {
+    significant1 = significant1 + 1
+    #print("TRUE")
+  } else {
+    #print("FALSE")
+  }
+}
+
+significant1
+power = significant1 / length(p_vals)
+power
+```
+
+2. Find the power when the sample size is 1000 patients. (5 points)
+
+```{r}
+patients2 = 1000
+significant2 = 0
+
+for (i in seq(p_vals)) {
+  treatment <- sample(groups, patients2, replace = TRUE)
+  outcome <- rnorm(1000, mean, sd)
+  data <- data.frame(cbind(treatment, outcome))
+  data$outcome[data$treatment == 1] <- data$outcome[data$treatment == 1] + 5
+  model <- lm(outcome ~ treatment, data = data)
+  pval <- summary(model)$coefficients[2,4]
+  p_vals[i] <- pval
+  if (pval < alpha) {
+    significant2 = significant2 + 1
+    #print("TRUE")
+  } else {
+    #print("FALSE")
+  }
+}
+
+significant2
+power = significant2 / length(p_vals)
+power
+```
+
+
+**QUESTION 3**
+
+**15 points**
+
+Obtain a copy of the [football-values lecture](https://github.com/couthcommander/football-values).
+Save the `2016/proj_wr16.csv` file in your working directory.  Read
+in the data set and remove the first two columns.
+
+```{r}
+wr <- read.csv("proj_wr16.csv", header = TRUE, sep = ",")
+head(wr)
+wr[,1] <- NULL
+wr[,1] <- NULL
+head(wr)
+```
+
+1. Show the correlation matrix of this data set. (3 points)
+
+```{r}
+cor.wr <- cor(wr)
+cor.wr
+```
+
+2. Generate a data set with 30 rows that has a similar correlation
+structure.  Repeat the procedure 10,000 times and return the mean
+correlation matrix. (10 points)
+
+```{r}
+cor.wr <- cor(wr)
+cov.wr <- var(wr) 
+means.wr <- colMeans(wr)
+library(MASS)
+
+wr.sim1 <- mvrnorm(30, mu = means.wr, Sigma = cov.wr, empirical = FALSE)
+cor.sim1 <- cor(wr.sim1)
+cor.sim1; cor.wr
+
+matrix.wr <- 0
+sims <- 10000
+
+for (i in seq(sims)) {
+  wr.sim1 <- mvrnorm(30, mu = means.wr, Sigma = cov.wr, empirical = FALSE)
+  matrix.wr <- matrix.wr + cor(wr.sim1)
+}
+
+matrix.mean <- matrix.wr/sims
+matrix.mean
+```
+
+3. Generate a data set with 30 rows that has the exact correlation
+structure as the original data set. (2 points)
+
+```{r}
+wr.sim2 <- mvrnorm(30, mu = means.wr, Sigma = cov.wr, empirical = TRUE)
+cor.sim2 <- cor(wr.sim2)
+cor.sim2; cor.wr
+```
+
+
+**QUESTION 4**
+
+**10 points**
+
+Use \LaTeX to create the following expressions.
+
+1. Equation 1 (4 points)
+
+
+\begin{equation}
+ P(B) = \sum_{j} P(B | A_{j}) P(A_{j}),
+ \\
+ \Rightarrow P(A_{i} | B) = \frac{P(B | A_{i}) P(A_{i})}{\sum_{j} P(B | A_{j}) P(A_{j})}
+\end{equation}
+
+
+2. Equation 2 (3 points)
+
+
+\begin{equation}
+ \hat{f} (\zeta) = \int_\infty^\infty f(x) e^{-2 \pi i x \zeta} \, dx
+\end{equation}
+
+3. Equation 3 (3 points)
+
+
+\begin{equation}
+  \textbf{J} = \frac{d\textbf{f}}{d\textbf{x}}
+  = \begin{bmatrix} \frac{\partial \textbf{f}}{\partial x_{1}} & \cdots & \frac{\partial \textbf{f}}{\partial x_{n}} \end{bmatrix}
+  = \begin{bmatrix} \frac{\partial f}{\partial x_{1}} & \cdots & \frac{\partial f}{\partial x_{n}} \\ \vdots & \ddots & \vdots \\ \frac{\partial fm}{\partial x_{1}} & \cdots & \frac{\partial fm}{\partial x_{n}} \end{bmatrix}
+\end{equation}
+
