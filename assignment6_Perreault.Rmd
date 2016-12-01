@@ -68,6 +68,8 @@ Use the simulated results from question 1 to reproduce (as closely as possible) 
 ![generations plot](http://d.pr/i/Xh0d+)
 
 ```{r}
+library(ggplot2)
+
 ggplot(gen.data, aes(x=m, y=f)) + geom_point(alpha=0.25) + facet_wrap(~ gen)
 ```
 
@@ -119,7 +121,7 @@ for (i in 1:10) {
   rownames(interval) <- NULL
 }
 
-ggplot(data=interval, mapping = aes(x=interval$n, group = factor(treatment))) + geom_ribbon(aes(ymin = lb, ymax = ub, fill = factor(treatment)), alpha = 0.5) + geom_line(aes(y = m)) + labs("x" = "Number of Patients", "y" = "Mean") + scale_fill_discrete(name = "", labels=c("No Treatment","Treatment"))
+ggplot(data=interval, mapping = aes(x=interval$n, group = factor(treatment))) + geom_ribbon(aes(ymin = lb, ymax = ub, fill = factor(treatment)), alpha = 0.5) + geom_line(aes(y = m)) + labs("x" = "Number of Patients", "y" = "Mean") + scale_fill_discrete(name = "", labels=c("No Treatment","Treatment")) + theme_bw()
 ```
 
 
@@ -160,7 +162,7 @@ print(patient)
 
 ```{r}
 #install.packages("cowplot")
-#library(cowplot)
+library(cowplot)
 
 mean.medrec <- function(data) {
   total.mean <- list(Pulse = mean(data$pulse), Temperature = mean(data$temp), Fluid_Intake = mean(data$fluid))
